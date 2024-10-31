@@ -23,15 +23,15 @@ const app = express();
 app.use(express.json());
 
 app.post('/produtos', async (req, res) => {
-  const { nome, descricao, preco, estoque } = req.body;
+  const { descricao, preco, estoque, data_ } = req.body;
   try {
     const result = await pool.query(
-      'INSERT INTO produto (nome, descricao, preco, estoque) VALUES ($1, $2, $3, $4) RETURNING *',
-      [nome, descricao, preco, estoque]
+      'INSERT INTO produto (descricao, preco, estoque, data_) VALUES ($1, $2, $3, $4) RETURNING *',
+      [descricao, preco, estoque, data_]
     );
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao criar produto' });
+    res.status(500).json({ error: 'Erro ao criar produto' + error });
   }
 });
 
@@ -44,13 +44,26 @@ app.get('/produtos', async (req, res) => {
   }
 });
 
+app.get('/produtos/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('SELECT * FROM produto WHERE id = $1', [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Produto não encontrado' });
+    }
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar produtos' });
+  }
+});
+
 app.put('/produtos/:id', async (req, res) => {
   const { id } = req.params;
-  const { nome, descricao, preco, estoque } = req.body;
+  const { descricao, preco, estoque, data_ } = req.body;
   try {
     const result = await pool.query(
-      'UPDATE produto SET nome = $1, descricao = $2, preco = $3, estoque = $4 WHERE id = $5 RETURNING *',
-      [nome, descricao, preco, estoque, id]
+      'UPDATE produto SET descricao = $1, preco = $2, estoque = $3, data_ = $4 WHERE id = $5 RETURNING *',
+      [descricao, preco, estoque, data_, id]
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Produto não encontrado' });
