@@ -1,4 +1,4 @@
-# Produto App
+# Produto API
 
 ## Como executar localmente
 
