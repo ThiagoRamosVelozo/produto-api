@@ -81,7 +81,7 @@ app.delete('/produtos/:id', async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Produto não encontrado' });
     }
-    res.status(200).json({ message: 'Produto deletado com sucesso' });
+    res.status(200).json(result.rows[0]);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao deletar produto' });
   }
